@@ -27,13 +27,17 @@ import {
     ApiBody,
     ApiCreatedResponse,
     ApiDefaultResponse,
+    ApiForbiddenResponse,
     ApiInternalServerErrorResponse,
     ApiNotFoundResponse,
     ApiOkResponse,
     ApiOperation,
     ApiParam,
     ApiTags,
+    ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { Auth } from 'src/auth/decorators/auth.decorator';
+import { ROLES } from 'src/utils/roles.enum';
 
 @Controller('products')
 @ApiTags('Products')
@@ -59,6 +63,13 @@ export class ProductsController {
     @ApiBadRequestResponse({
         description: 'Invalid ID',
     })
+    @ApiUnauthorizedResponse({
+        description: 'Unauthorized - Invalid or expired token',
+    })
+    @ApiForbiddenResponse({
+        description:
+            'Forbidden - User does not have SUPERADMIN, ADMIN or USER role',
+    })
     @ApiDefaultResponse({
         description: 'Default response',
     })
@@ -68,6 +79,7 @@ export class ProductsController {
         required: true,
         type: Number,
     })
+    @Auth(ROLES.SUPERADMIN, ROLES.ADMIN, ROLES.USER)
     async findProductById(
         @Param('id', ParseIntPipe) id: number,
     ): Promise<ProductModel> {
@@ -125,6 +137,13 @@ export class ProductsController {
     @ApiBadRequestResponse({
         description: 'Invalid ID',
     })
+    @ApiUnauthorizedResponse({
+        description: 'Unauthorized - Invalid or expired token',
+    })
+    @ApiForbiddenResponse({
+        description:
+            'Forbidden - User does not have SUPERADMIN, ADMIN or USER role',
+    })
     @ApiDefaultResponse({
         description: 'Default response',
     })
@@ -134,6 +153,7 @@ export class ProductsController {
         required: true,
         type: Number,
     })
+    @Auth(ROLES.SUPERADMIN, ROLES.ADMIN, ROLES.USER)
     async getProductStock(
         @Param('id', ParseIntPipe) id: number,
     ): Promise<number> {
@@ -156,11 +176,18 @@ export class ProductsController {
     @ApiBadRequestResponse({
         description: 'Invalid data',
     })
+    @ApiUnauthorizedResponse({
+        description: 'Unauthorized - Invalid or expired token',
+    })
+    @ApiForbiddenResponse({
+        description: 'Forbidden - User does not have SUPERADMIN or ADMINrole',
+    })
     @ApiDefaultResponse({
         description: 'Default response',
     })
     @ApiBody({ type: CreateProductDto, required: true })
     @UseInterceptors(FilesInterceptor('images'))
+    @Auth(ROLES.SUPERADMIN, ROLES.ADMIN)
     async createProduct(
         @Body() createProductDto: CreateProductDto,
         @UploadedFiles(
@@ -192,6 +219,12 @@ export class ProductsController {
     @ApiBadRequestResponse({
         description: 'Invalid data',
     })
+    @ApiUnauthorizedResponse({
+        description: 'Unauthorized - Invalid or expired token',
+    })
+    @ApiForbiddenResponse({
+        description: 'Forbidden - User does not have SUPERADMIN or ADMIN role',
+    })
     @ApiDefaultResponse({
         description: 'Default response',
     })
@@ -203,6 +236,7 @@ export class ProductsController {
     })
     @ApiBody({ type: UpdateProductDto, required: true })
     @UseInterceptors(FilesInterceptor('images'))
+    @Auth(ROLES.SUPERADMIN, ROLES.ADMIN)
     async updateProduct(
         @Param('id', ParseIntPipe) id: number,
         @Body() updateProductDto: UpdateProductDto,
@@ -236,6 +270,12 @@ export class ProductsController {
     @ApiBadRequestResponse({
         description: 'Invalid ID',
     })
+    @ApiUnauthorizedResponse({
+        description: 'Unauthorized - Invalid or expired token',
+    })
+    @ApiForbiddenResponse({
+        description: 'Forbidden - User does not have SUPERADMIN or ADMIN role',
+    })
     @ApiDefaultResponse({
         description: 'Default response',
     })
@@ -245,6 +285,7 @@ export class ProductsController {
         required: true,
         type: Number,
     })
+    @Auth(ROLES.SUPERADMIN, ROLES.ADMIN)
     async removeProduct(
         @Param('id', ParseIntPipe) id: number,
     ): Promise<ProductModel> {

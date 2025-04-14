@@ -168,7 +168,10 @@ export class ProductsService {
 
         try {
             const product = await this.prismaService.product.create({
-                data: createProductDto,
+                data: {
+                    ...createProductDto,
+                    userId: createProductDto.userId,
+                },
             });
 
             if (files && files.length > 0) {

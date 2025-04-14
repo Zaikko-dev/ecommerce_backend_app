@@ -11,9 +11,10 @@ export class CreateCategoryDto {
         required: true,
         type: String,
     })
-    @IsString()
     @Type(() => String)
     @Transform(({ value }: { value: string }) => value?.toLowerCase())
+    @Transform(({ value }: { value: string }) => value?.trim())
+    @IsString()
     @MinLength(2)
     @MaxLength(25)
     name: string;
@@ -24,8 +25,9 @@ export class CreateCategoryDto {
         required: false,
         type: String,
     })
-    @IsString()
     @Type(() => String)
+    @Transform(({ value }: { value: string }) => value?.trim())
+    @IsString()
     @Optional()
     //@MinLength(2)
     @MaxLength(100)

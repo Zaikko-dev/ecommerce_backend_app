@@ -20,7 +20,7 @@ export const multerConfig = {
         callback(null, true);
     },
     limits: {
-        fileSize: 5 * 1024 * 1024,
-        files: 5,
+        fileSize: 3 * 1024 * 1024,
+        files: 4,
     },
 };

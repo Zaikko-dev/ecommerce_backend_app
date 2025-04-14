@@ -1,6 +1,6 @@
 import { Optional } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
     IsInt,
     IsNumber,
@@ -17,6 +17,7 @@ export class CreateProductDto {
         required: true,
         type: String,
     })
+    @Transform(({ value }: { value: string }) => value?.trim())
     @IsString()
     @MinLength(2)
     @MaxLength(50)
@@ -29,6 +30,7 @@ export class CreateProductDto {
         required: false,
         type: String,
     })
+    @Transform(({ value }: { value: string }) => value?.trim())
     @IsString()
     @Optional()
     @MaxLength(200)
@@ -66,4 +68,14 @@ export class CreateProductDto {
     @IsInt()
     @Type(() => Number)
     categoryId: number;
+
+    @ApiProperty({
+        description: 'Product user ID',
+        example: 1,
+        required: true,
+        type: Number,
+    })
+    @IsInt()
+    @Type(() => Number)
+    userId: number;
 }

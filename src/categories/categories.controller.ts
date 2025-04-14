@@ -14,12 +14,14 @@ import {
     ApiConflictResponse,
     ApiCreatedResponse,
     ApiDefaultResponse,
+    ApiForbiddenResponse,
     ApiInternalServerErrorResponse,
     ApiNotFoundResponse,
     ApiOkResponse,
     ApiOperation,
     ApiParam,
     ApiTags,
+    ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { CreateProductDto } from 'src/products/dto/create-product.dto';
 import { CategoriesService } from './categories.service';
@@ -29,6 +31,8 @@ import {
     Category as CategoryModel,
     Product as ProductModel,
 } from 'generated/prisma';
+import { Auth } from 'src/auth/decorators/auth.decorator';
+import { ROLES } from 'src/utils/roles.enum';
 
 @Controller('categories')
 @ApiTags('Categories')
@@ -51,6 +55,13 @@ export class CategoriesController {
     @ApiBadRequestResponse({
         description: 'Invalid ID',
     })
+    @ApiUnauthorizedResponse({
+        description: 'Unauthorized - Invalid or expired token',
+    })
+    @ApiForbiddenResponse({
+        description:
+            'Forbidden - User does not have SUPERADMIN, ADMIN or USER role',
+    })
     @ApiDefaultResponse({
         description: 'Default response',
     })
@@ -60,6 +71,7 @@ export class CategoriesController {
         required: true,
         type: Number,
     })
+    @Auth(ROLES.SUPERADMIN, ROLES.ADMIN, ROLES.USER)
     async findCategoryById(
         @Param('id', ParseIntPipe) id: number,
     ): Promise<CategoryModel> {
@@ -79,9 +91,17 @@ export class CategoriesController {
     @ApiInternalServerErrorResponse({
         description: 'Internal server error',
     })
+    @ApiUnauthorizedResponse({
+        description: 'Unauthorized - Invalid or expired token',
+    })
+    @ApiForbiddenResponse({
+        description:
+            'Forbidden - User does not have SUPERADMIN, ADMIN or USER role',
+    })
     @ApiDefaultResponse({
         description: 'Default response',
     })
+    @Auth(ROLES.SUPERADMIN, ROLES.ADMIN, ROLES.USER)
     async findAllCategories(): Promise<CategoryModel[]> {
         return this.categoriesService.findAllCategories();
     }
@@ -102,10 +122,17 @@ export class CategoriesController {
     @ApiBadRequestResponse({
         description: 'Invalid data',
     })
+    @ApiUnauthorizedResponse({
+        description: 'Unauthorized - Invalid or expired token',
+    })
+    @ApiForbiddenResponse({
+        description: 'Forbidden - User does not have SUPERADMIN role',
+    })
     @ApiDefaultResponse({
         description: 'Default response',
     })
     @ApiBody({ type: CreateCategoryDto })
+    @Auth(ROLES.SUPERADMIN)
     async createCategory(
         @Body() createCategoryDto: CreateCategoryDto,
     ): Promise<CategoryModel> {
@@ -125,6 +152,13 @@ export class CategoriesController {
     @ApiNotFoundResponse({
         description: 'Category not found',
     })
+    @ApiUnauthorizedResponse({
+        description: 'Unauthorized - Invalid or expired token',
+    })
+    @ApiForbiddenResponse({
+        description:
+            'Forbidden - User does not have SUPERADMIN, ADMIN or USER role',
+    })
     @ApiDefaultResponse({
         description: 'Default response',
     })
@@ -134,6 +168,7 @@ export class CategoriesController {
         required: true,
         type: Number,
     })
+    @Auth(ROLES.SUPERADMIN, ROLES.ADMIN, ROLES.USER)
     async getProductsByCategoryId(
         @Param('id', ParseIntPipe) id: number,
     ): Promise<ProductModel[]> {
@@ -156,6 +191,12 @@ export class CategoriesController {
     @ApiNotFoundResponse({
         description: 'Category not found',
     })
+    @ApiUnauthorizedResponse({
+        description: 'Unauthorized - Invalid or expired token',
+    })
+    @ApiForbiddenResponse({
+        description: 'Forbidden - User does not have SUPERADMIN role',
+    })
     @ApiDefaultResponse({
         description: 'Default response',
     })
@@ -166,6 +207,7 @@ export class CategoriesController {
         type: Number,
     })
     @ApiBody({ type: UpdateCategoryDto })
+    @Auth(ROLES.SUPERADMIN)
     async updateCategory(
         @Param('id', ParseIntPipe) id: number,
         @Body() updateCategoryDto: UpdateCategoryDto,
@@ -189,6 +231,12 @@ export class CategoriesController {
     @ApiConflictResponse({
         description: 'Category has products associated',
     })
+    @ApiUnauthorizedResponse({
+        description: 'Unauthorized - Invalid or expired token',
+    })
+    @ApiForbiddenResponse({
+        description: 'Forbidden - User does not have SUPERADMIN role',
+    })
     @ApiDefaultResponse({
         description: 'Default response',
     })
@@ -198,6 +246,7 @@ export class CategoriesController {
         required: true,
         type: Number,
     })
+    @Auth(ROLES.SUPERADMIN)
     async removeCategory(
         @Param('id', ParseIntPipe) id: number,
     ): Promise<CategoryModel> {
